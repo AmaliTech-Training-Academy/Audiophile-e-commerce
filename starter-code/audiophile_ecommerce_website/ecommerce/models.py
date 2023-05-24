@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
-    # image = models.ImageField(upload_to='images/')
+    image = models.ImageField(upload_to='category_images', blank=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
