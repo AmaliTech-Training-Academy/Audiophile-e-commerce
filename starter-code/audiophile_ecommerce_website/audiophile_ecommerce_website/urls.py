@@ -16,19 +16,10 @@ Including another URLconf
 """
 from django.urls import include, path
 from rest_framework import routers
-from ecommerce.views import CategoryAPIView, ProductAPIView, CartAPIView
+from ecommerce.views import  ProductListCreateView, ProductRetrieveView, ProductDestroyView, ProductUpdateView
 
-# router = routers.DefaultRouter()
-# router.register(r'categories', CategoryAPIView)
-# router.register(r'products', ProductAPIView)
-# router.register(r'cart', CartAPIView)
-
-# urlpatterns = [
-#     path('', include(router.urls)),
-# ]
-
+ 
 urlpatterns = [
-    # other URL patterns
     path('api/', include('ecommerce.urls')),
 ]
 

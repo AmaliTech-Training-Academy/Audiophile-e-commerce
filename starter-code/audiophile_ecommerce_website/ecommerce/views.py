@@ -1,201 +1,76 @@
 from django.shortcuts import render
-from rest_framework.views import APIView
 from django.http import Http404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework import viewsets
-from .models import Category, Products, Cart, CartItem
+from .models import Category, Product, Cart, CartItem
 from .serializers import CategorySerializer, ProductSerializer, CartSerializer, CartItemSerializer
+from rest_framework import generics
 
-#CategoryAPIView
-class CategoryAPIView(APIView):
-#logic to handle GET request
-    def get(self, request):
-        category = Category.objects.all()
-        serializer = CategorySerializer(category, many=True)
-        return Response(serializer.data)
-        
-#logic to handle POST request
-    def post(self, request):
-        serializer = CategorySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-#logic to handle PUT request
-    def put(self, request, pk):
-        try:
-            category = Category.objects.get(pk=pk)
-        except Category.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = CategorySerializer(category, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-# logic to handle PATCH request
-    def patch(self, request, pk=None):
-        try:
-            category = Category.objects.get(pk=pk)
-        except Category.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+#Product
+class ProductListCreateView(generics.ListCreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
-        serializer = CategorySerializer(category, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-# logic for handle DELETE request
-    def delete(self, request, pk):
-        try:
-            instance = Category.objects.get(pk=pk)
-        except Category.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        instance.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
-#ProductAPIView
-class ProductAPIView(APIView):
-        def get(self, request):
-            products = Products.objects.all()
-            serializer = ProductSerializer(products, many=True)
-            return Response(serializer.data)    
-        
-        def post(self, request):
-            serializer = ProductSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-        def put(self, request, pk):
-            try:
-                products = Products.objects.get(pk=pk)
-            except Products.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-            serializer = ProductSerializer(products, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    
-        def patch(self, request, pk):
-        # Logic for handling PATCH request
-            try:
-                products = Products.objects.get(pk=pk)
-            except Category.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+class ProductRetrieveView(generics.RetrieveAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
-            serializer = ProductSerializer(products, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ProductUpdateView(generics.UpdateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
-        def delete(self, request, pk):
-        # Logic for handling DELETE request
-            try:
-                products = Products.objects.get(pk=pk)
-            except Category.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+class ProductDestroyView(generics.DestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
-            products.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        
+#Category
+class CategoryListCreateView(generics.ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
-#CartAPIView
-class CartAPIView(APIView):
-    def get(self, request):
-        cart = Cart.objects.all()
-        serializer = CartSerializer(cart, many=True)
-        return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = CartSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def put(self, request, pk):
-        try:
-            cart = Cart.objects.get(pk=pk)
-        except Cart.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = CartSerializer(cart, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def patch(self, request, pk):
-        try:
-            cart = Cart.objects.get(pk=pk)
-        except Cart.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = CartSerializer(cart, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request, pk):
-        try:
-            cart = Cart.objects.get(pk=pk)
-        except Cart.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        cart.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class CategoryRetrieveView(generics.RetrieveAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
-    
-    #CartItemAPIView
-class CartItemAPIView(APIView):
-    def get(self, request):
-        cartitem = CartItem.objects.all()
-        serializer = CartItemSerializer(cartitem, many=True)
-        return Response(serializer.data)
-        
-    def post(self, request):
-        serializer = CartItemSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-    def put(self, request, pk):
-        try:
-            cartitem = CartItem.objects.get(pk=pk)
-        except CartItem.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = CartSerializer(cartitem, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    
-    def patch(self, request, pk):
-        # Logic for handling PATCH request
-        try:
-            cartitem = Category.objects.get(pk=pk)
-        except CartItem.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+class CategoryUpdateView(generics.UpdateAPIView):
+    queryset = Category.objects.all()
+    serializer_class  = CategorySerializer
 
-        serializer = CartSerializer(cartitem, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CategoryDestroyView(generics.DestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
-    def delete(self, request, pk):
-        # Logic for handling DELETE request
-        try:
-            cartitem = Cart.objects.get(pk=pk)
-        except Cart.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+#Cart
+class CartListCreateView(generics.ListCreateAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
 
-        cartitem.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
+class CartRetrieveView(generics.RetrieveAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+
+class CartUpdateView(generics.UpdateAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+
+class CartDestroyView(generics.DestroyAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+
+#CartItem
+class CartItemListCreateView(generics.ListCreateAPIView):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
+
+class CartItemRetrieveView(generics.RetrieveAPIView):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
+
+class CartItemUpdateView(generics.UpdateAPIView):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
+class CartItemDestroyView(generics.DestroyAPIView):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
 
